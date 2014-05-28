@@ -28,4 +28,4 @@ I learnt django through the basic polling app as mentioned in the [django-docs](
 
 The code in this repository is work in progress.
 
-![Poll app screenshot](https://github.com/saurabh-hirani/django_test_apps/blob/master/poll-scrshot.png)
+![Poll app screenshot](https://raw.githubusercontent.com/saurabh-hirani/django_test_apps/master/poll-scrshot.png)
