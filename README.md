@@ -1,8 +1,9 @@
 django_test_apps
+================
 
 Rationale:
 
-I learnt django through the basic polling app as mentioned in the --django docs-- and through Mike Hibbert's --youtube videos--. This repository builds upon their ideas with the following additions:
+I learnt django through the basic polling app as mentioned in the [django-docs](https://docs.djangoproject.com/en/1.6/intro/tutorial01/) and through Mike Hibbert's [[youtube videos](https://www.youtube.com/watch?v=oT1A1KKf0SI). This repository builds upon their ideas with the following additions:
 
 Generic features:
 
@@ -26,4 +27,4 @@ Polling app specific features:
 - Using TestCase to perform testing and the very useful coverage module to ensure code coverage.
 
 
-The code in this repository is work in progress. All the code in this repo is under GPL v2.
+The code in this repository is work in progress.
