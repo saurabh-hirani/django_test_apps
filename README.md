@@ -1,8 +1,6 @@
 django_test_apps
 ================
 
-Rationale:
-
 I learnt django through the basic polling app as mentioned in the [django-docs](https://docs.djangoproject.com/en/1.6/intro/tutorial01/) and through Mike Hibbert's [youtube videos](https://www.youtube.com/watch?v=oT1A1KKf0SI). This repository builds upon their ideas with the following additions:
 
 - Generic features:
