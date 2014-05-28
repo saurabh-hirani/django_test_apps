@@ -1,0 +1,18 @@
+{% extends "test_apps/base.html" %}
+
+{% block content  %}
+    <p class='lead'>
+    Welcome {{ full_name }}.
+    </p>
+
+    <p>
+    Following apps have been installed and ready to use:
+    </p>
+    <ul class='list-group'>
+    {% for _, app_data in target_apps.items %}
+        <li class='list-group-item'> 
+            <a href={% url app_data.url %}>{{ app_data.caption }}</a>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock  %}

@@ -1,0 +1,39 @@
+{% extends "polls/base.html" %}
+
+{% block content %}
+   
+    <div class='row'>
+        <div class='col-md-6'>
+            <legend>{{ poll.question }}</legend>
+            {% if error_message %}
+                <div class='alert alert-warning'>
+                    <a class='close' data-dismiss='alert'>x</a>
+                    <strong>{{ error_message }}</strong>
+                </div>
+            {% endif %}
+            {% if poll.choice_set.all %}
+                {% if not poll.has_voting_started %}
+                <legend>Welcome! You are the first voter for this poll.</legend> 
+                {% endif %}
+                <form action="{% url 'polls:vote' poll.id %}" class="form-horizontal" method="post" accept-charset="utf-8">
+                    {% csrf_token %}
+                    {% for choice in poll.choice_set.all %}
+                    <div class="form-group line">
+                        <div class='col-xs-1 radio-inline'>
+                            <input type="radio" name="choice" class="form-control" id="choice{{ forloop.counter }}" value='{{ choice.id }}'/>
+                            <label class='control-label' for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="form-group">
+                        <div class='col-sm-10'>
+                            <input type="submit" class="btn btn-primary" value="Vote">
+                        </div>
+                    </div>
+                </form>
+            {% else %}
+                No poll choices set. Please go to <a href="{% url 'admin:index' %}" target='_blank'>Admin Page</a> to set the choices.
+            {% endif %}
+        </div>
+    </div>
+{% endblock  %}

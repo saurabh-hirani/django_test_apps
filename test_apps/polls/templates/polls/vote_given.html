@@ -1,0 +1,21 @@
+{% extends "polls/base.html" %}
+
+{% block content %}
+    <div class='row'>
+        <div class='col-md-6'>
+            <h2>{{ poll.question }}</h2>
+            <p>
+            Thank you for your vote.
+            </p>
+            <p>
+            To complete the poll, the following {{ pending_voters|length }} voter{{ pending_voters|length|pluralize }} are yet to cast their vote:
+            </p>
+            <ul class='list-group'>
+            {% for voter in pending_voters %}
+              <li class='list-group-item'>{{ voter.user.username }}</li>
+            {% endfor %}
+            </ul>
+            <a class="btn btn-primary" type="button" href="{% url 'polls:index' %}">Back to main page</a>
+        </div>
+    </div>
+{% endblock %}

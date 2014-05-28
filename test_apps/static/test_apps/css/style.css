@@ -1,0 +1,112 @@
+html,
+body {
+    height: 100%
+}
+
+body {
+    padding-top: 70px;
+    padding-bottom: 70px;
+
+}
+
+.control-label {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.navbar-fixed-top {
+    min-height: 30px;
+}
+
+.header {
+    background-color: #f5f5f5;
+}
+
+.header a {
+    color: black
+}
+
+
+.navbar-fixed-bottom {
+    min-height: 30px;
+    font-size: 10px;
+    line-height: 8px;
+}
+
+.navbar-fixed-bottom .navbar-inner {
+    min-height: 15px;
+}
+
+.navbar-fixed-bottom .p {
+    margin: 2px 0 2px;
+}
+
+.footer {
+    background-color: #f5f5f5;
+}
+
+input[type="radio"] {
+    margin: 1px 0 0;
+    margin-top: 1px \9;
+    line-height: normal;
+}
+
+.table .checkbox-column  {
+    width: 5%;
+}
+
+.index-div {
+    margin-bottom: 15px;
+}
+
+.tab-container {
+    padding: 30px;
+}
+/*
+input[type="checkbox"] {
+    margin-top: 0;
+    line-height: normal;
+}
+*/
+
+
+form .line {
+    margin-bottom: 1px;
+}
+/*
+
+#wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -60px;
+}
+
+#push,
+#footer {
+    height: 60px;
+}
+
+
+.container .credit {
+    margin: 20px 0;
+}
+
+#page {
+  width: 900px;
+  text-align: left;
+  margin: 18px auto 28px auto;
+}
+#sidebar {
+  float: left;
+  height: 50%;
+  width: 10%;
+  border: 1px solid #000;
+}
+#content {
+  float: left;
+  width: 600px;
+  border: 1px solid #000;
+  padding: 10px;
+}
+*/

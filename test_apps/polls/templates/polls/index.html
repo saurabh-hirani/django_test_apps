@@ -1,0 +1,376 @@
+{% extends "polls/base.html" %}
+
+{% block title %}
+    Poll list
+{% endblock %}
+
+{% block app_js %}
+<script type="text/javascript" charset="utf-8">
+    var poll_data = {}
+
+    {% for poll_data in polls.all %}
+        poll_data['{{ poll_data.ref.id }}'] = {};
+        poll_data['{{ poll_data.ref.id }}']['question'] = '{{ poll_data.ref.question }}';
+    {% endfor %}
+
+    {% for poll_data in polls.open %}
+        poll_data['{{ poll_data.ref.id }}']['pending_voters'] = [];
+        poll_data['{{ poll_data.ref.id }}']['poll_voters'] = [];
+        // load the pending voters
+        poll_data['{{ poll_data.ref.id }}']['pending_voters'] = [];
+        var pending_voters = poll_data['{{ poll_data.ref.id }}']['pending_voters'];
+        {% for voter in poll_data.pending_voters  %}
+            pending_voters.push('{{ voter.user.username }}');
+        {% endfor %}
+        // load the total voters
+        poll_data['{{ poll_data.ref.id }}']['poll_voters'] = [];
+        var poll_voters = poll_data['{{ poll_data.ref.id }}']['poll_voters'];
+        {% for voter in poll_data.poll_voters  %}
+            poll_voters.push('{{ voter.user.username }}');
+        {% endfor %}
+    {% endfor %}
+
+    var poll_modify_data = {
+        'reopen': {
+            'confirm_text': 'Do you want to reopen the following polls?',
+        },
+        'vote_randomly': {
+            'confirm_text': 'Do you want to perform random voting and close the following polls?',
+        }
+    }
+
+    $(document).ready(
+        function() {
+            // Show list of voters/pending-voters 
+            $('.show-users').on('click', function() {
+                var voter_type = $(this).attr('name');
+                var poll_id = $(this).attr('seq');
+                var usernames = poll_data[poll_id][voter_type];
+                var n_usernames = usernames.length;
+
+                // decide the label
+                var label = 'Poll voters';
+                if (voter_type.search('pending') != -1) {
+                    label = 'Pending voters';
+                }
+
+                // populate the list
+                $('#user-list ul').empty();
+                $('#voter-type').text(label);
+                for (var i = 0; i < n_usernames; i++) {
+                  $('#user-list ul').append("<li class='list-group-item'> " + usernames[i] + " </li>");
+                }
+                $('#voter-list-modal').modal();
+            });
+
+            // Modify selected polls
+            $('.modify-polls-btn').on('click', function(e) {
+                // prevent default action    
+                e.preventDefault();
+
+                // validate input
+                $('.submit-errors').empty();
+                $('.submit-errors').parent().hide();
+
+                var action = $(this).attr('id').split('_').slice(0, -1).join('_');
+                var polls = $(this).parent().closest('div').find('.checkone:checked').toArray();
+                var n_polls = polls.length;
+
+                if (n_polls == 0) {
+                    var error = 'Please select at least one poll';
+                    var err_area = $(this).parent().closest('div').find('.submit-errors')[0];
+                    $(err_area).append('<li>'+ error +'</li>');
+                    $(err_area).parent().show();
+                    return false;
+                }
+
+                // show confirmation modal 
+                console.log(poll_modify_data[action]['confirm_text']);
+                $('.modal-title').text(poll_modify_data[action]['confirm_text']);
+                $('#modify-polls-modal .modal-body ul').empty();
+                for (var i = 0; i < n_polls; i++) {
+                  var poll_id = $(polls[i]).val();
+                  $('#modify-polls-modal .modal-body ul').append("<li class='list-group-item'> " + poll_data[poll_id]['question'] + " </li>");
+                }
+
+                // show confirmation dialog
+                $('#modify-polls-modal').modal();
+
+                $('.continue-modify-polls').on('click', function(e) {
+                    $('#modify-polls-modal').modal('hide');
+                    // show waiting dialog
+                    $('#waiting-modal').modal();
+                    // submit the form
+                    $('#' + action + '_form').submit();
+                });
+            });
+
+
+            // go to specific tab on clicking link in the summary page
+            $('.link_tab_header').on('click', function() {
+                var name = $(this).attr('name');
+                var target = '#header_' + name;
+                $(target).trigger('click');
+            });
+
+            // modify the url on header tab click
+            $("a.link_header a.link_tab_header").on("shown.bs.tab", function (e) {
+                var id = $(e.target).attr("href").substr(1);
+                window.location.hash = id;
+            });
+
+            // checkall functionality
+            $('input[type=checkbox]').click(function() {
+                if($(this).hasClass('checkall')) {
+                    $(this).parent().closest('div').find('.checkone').prop('checked', this.checked);
+                } else {
+                    var is_checkbox_on = $(this).prop('checked');
+                    // if single checkbox off - checkall off
+                    if (is_checkbox_on == false) {
+                        $(this).parent().closest('div').find('.checkall').prop('checked', false);
+                    } else {
+                        // if all single checkboxes on - checkall on
+                        var n_all_checkboxes = $(this).parent().closest('div').find('.checkone').length;
+                        var n_on_checkboxes = $(this).parent().closest('div').find('.checkone:checked').length;
+                        if (n_all_checkboxes == n_on_checkboxes) {
+                            $(this).parent().closest('div').find('.checkall').prop('checked', true);
+                        }
+                    }
+                }
+            });
+
+            // on load of the page: switch to the currently selected tab
+            var hash = window.location.hash;
+            if (hash == '') {
+                $('#header_all_polls_tab').trigger('click');
+            } else {
+                var target = '#header_' + hash.replace(/#/g, '');
+                $(target).tab('show');
+            }
+
+            // tool tips
+            $('.link_closed_polls_tab:first').tooltip({
+                title: 'Polls in which all voters have voted',
+                trigger: 'hover',
+                placement: 'right'
+            });
+            $('.link_user_open_polls_tab:first').tooltip({
+                title: "Open polls in which you haven't voted",
+                trigger: 'hover',
+                placement: 'right'
+            });
+            $('.link_open_polls_tab:first').tooltip({
+                title: "Polls in which all/some voters haven't voted",
+                trigger: 'hover',
+                placement: 'right'
+            });
+        }
+    )
+</script>
+{% endblock %}
+
+{% block content  %}
+    <div class='row'>
+        <div class='col-md-6'>
+            <ul class="nav nav-tabs polls_tabs">  
+            <!-- set the tabs -->
+            {% if polls.all %}
+                <li><a href="#all_polls_tab" id='header_all_polls_tab' data-toggle='tab'>Summary</a></li>     
+                {% if polls.open %}
+                    {% if polls.user_open %}
+                        <li><a class='tab_header' href="#user_open_polls_tab" id='header_user_open_polls_tab' data-toggle='tab'>Vote</a></li>  
+                    {% endif %}
+                    <li><a class='tab_header' href="#open_polls_tab" id='header_open_polls_tab' data-toggle='tab'>Open</a></li>   
+                {% endif %}
+                {% if polls.closed %}
+                    <li><a class='tab_header' href="#closed_polls_tab" id='header_closed_polls_tab' data-toggle='tab'>Closed</a></li>   
+                {% endif %}
+            {% else %}
+                <div>
+                    <p class='lead'>
+                        No polls.
+                        {% if request.user.is_superuser %}
+                            To create a new poll - click <a href="/admin/polls/poll/add" target="_blank">here</a> </p>
+                        {% else %}
+                            Login as admin to this application to create a new poll.
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
+            </ul> 
+
+            <div class='tab-content tab-container'>
+
+                <div class='index-div tab-pane' id='all_polls_tab'>
+                    <table id='all_polls_list' class='table table-striped table-bordered'>
+                    <th>Poll</th>
+                    <th>Status</th>
+                    {% for poll_data in polls.all %}
+                        <tr>
+                            <td>{{ poll_data.ref.question }}</td>
+                            {% if poll_data.status == 'open' %}
+                                <td><a href='#open_polls_tab' class='link_tab_header link_open_polls_tab' name='open_polls_tab' data-toggle='tab'>Open</a></td>
+                            {% else %}
+                                {% if poll_data.status == 'user_open' %}
+                                    <td><a href='#user_open_polls_tab' class='link_tab_header link_user_open_polls_tab' name='user_open_polls_tab' data-toggle='tab'>Vote</a></td>
+                                {% else %}
+                                    {% if poll_data.status == 'closed' %}
+                                        <td><a href='#closed_polls_tab' class='link_tab_header link_closed_polls_tab' name='closed_polls_tab' data-toggle='tab'>Closed</a></td>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </table>
+                </div>
+
+                <div class='index-div tab-pane' id='user_open_polls_tab'>
+                    <table id='user_open_polls_list' class='table table-striped table-bordered'>
+                    <th>Poll</th>
+                    {% for poll_data in polls.user_open %}
+                        <tr>
+                        <td><a href="{% url 'polls:detail' poll_data.ref.id  %}">{{ poll_data.ref.question }}</a></td>
+                        </tr>
+                    {% endfor %}
+                    </table>
+                </div>
+
+                <div class='index-div tab-pane' id='open_polls_tab'>
+                    <div class='alert alert-success' style='display: none'>
+                        <ul class='submit-update'></ul>
+                    </div>
+                    <div class='alert alert-warning' style='display: none'>
+                        <ul class='submit-errors'></ul>
+                    </div>
+                    <form id='vote_randomly_form' action="{% url 'polls:vote_randomly' %}" method="post" accept-charset="utf-8">
+                        {% csrf_token %}
+                        <table id='open_polls_list' class='table table-striped table-bordered'>
+                            {% if request.user.is_superuser %}
+                                <th class='checkbox-column'><input class='checkall' type='checkbox' id='all_polls' value='1'></th>
+                            {% endif %}
+                            <th>Poll</th>
+                            <th>Voters</th>
+                            <th>Pending voters</th>
+                            {% for poll_data in polls.open %}
+                            <tr>
+                                {% if request.user.is_superuser %}
+                                <td><input type='checkbox' class='checkone' name='poll_ids' value='{{ poll_data.ref.id }}'></td>
+                                {% endif %}
+                                <td>{{ poll_data.ref.question }}</td>
+                                <td>
+                                {% if poll_data.poll_voters  %}
+                                    <a class='show-users' seq='{{ poll_data.ref.id }}' name='poll_voters' href='#open_polls_tab'>{{ poll_data.poll_voters|length }}</a> 
+                                {% else %} 
+                                    {{ poll_data.poll_voters|length }}
+                                {% endif %}
+                                </td>
+
+                                <td>
+                                {% if poll_data.pending_voters  %}
+                                    <a class='show-users' seq='{{ poll_data.ref.id }}' name='pending_voters' href='#open_polls_tab'>{{ poll_data.pending_voters|length }}</a> 
+                                {% else %} 
+                                    {{ poll_data.pending_voters|length }}
+                                {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        {% if request.user.is_superuser %}
+                            <input type='submit' class="btn btn-primary modify-polls-btn" id='vote_randomly_btn' value='Vote randomly'>
+                        {% endif %}
+                    </form>
+                </div>                        
+
+                <div class='index-div tab-pane' id='closed_polls_tab'>                        
+                    <div class='alert alert-success' style='display: none'>
+                        <ul class='submit-update'></ul>
+                    </div>
+                    <div class='alert alert-warning' style='display: none'>
+                        <ul class='submit-errors'></ul>
+                    </div>
+                    <form id='reopen_form' action="{% url 'polls:reopen' %}" method="post" accept-charset="utf-8">
+                        {% csrf_token %}
+                        <table id='closed_polls_list' class='table table-striped table-bordered'>
+                        {% if request.user.is_superuser %}
+                            <th class='checkbox-column'><input type='checkbox' class='checkall' id='all_polls' value='1'></th>
+                        {% endif %}
+                        <th>Poll</th>
+                        <th>Winner</th>
+                        <th>Votes</th>
+                            {% for poll_data in polls.closed %}
+                            <tr>
+                                {% if request.user.is_superuser %}
+                                <td><input type='checkbox' class='checkone' name='poll_ids' value='{{ poll_data.ref.id }}'></td>
+                                {% endif %}
+                                <td><a href="{% url 'polls:results' poll_data.ref.id  %}">{{ poll_data.ref.question }}</a></td>
+                                <td>{{ poll_data.winner }}</td>
+                                <td>{{ poll_data.winner.votes }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        {% if request.user.is_superuser %}
+                            <input type='submit' class="btn btn-primary modify-polls-btn" id='reopen_btn' value='Reopen Polls'>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- show list of users -->
+    <div class="modal fade" id="voter-list-modal" tabindex="-1" role="dialog" aria-labelledby="voter-list-modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                <h4 class="modal-title" id="voter-type"></h4>
+                </div>
+                <div class="modal-body" id='user-list'>
+                    <ul class='list-group'>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+               </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- confirm modify polls actions -->
+    <div class="modal fade" id="modify-polls-modal" tabindex="-1" role="dialog" aria-labelledby="modify-polls-modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+                    <ul class='list-group'>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button class='btn btn-success continue-modify-polls'>Continue</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+               </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- waiting modal -->
+    <div class="modal fade" id="waiting-modal" tabindex="-1" role='dialog' aria-labelledby='waiting-modal' aria-hidden='true' data-backdrop='static' data-keyboard='false'>
+        <div class="modal-dialog">
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h3>Processing...</h3>
+                </div>
+                <div class="modal-body">
+                    <div class='progress progress-striped active'>
+                        <div class='progress-bar' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: 100%'> </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

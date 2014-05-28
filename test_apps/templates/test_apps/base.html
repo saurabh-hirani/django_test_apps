@@ -1,0 +1,83 @@
+{% load staticfiles %}
+<html>
+<head>
+<meta charset="utf-8">
+<title>
+    {% block title %}
+    Base Title
+    {% endblock %}
+</title>
+</head>
+
+{% block common_css %}
+<link rel="stylesheet" href="{% static 'test_apps/css/bootstrap.min.css' %}" type="text/css" media="screen" title="no title" charset="utf-8">
+<link rel="stylesheet" href="{% static 'test_apps/css/style.css' %}" type="text/css" charset="utf-8">
+{% endblock %}
+
+{% block common_js %}
+<script src="{% static 'test_apps/js/jquery-2.1.1.min.js' %}" type="text/javascript" charset="utf-8"></script>
+<script src="{% static 'test_apps/js/jquery-2.1.1.min.map' %}" type="text/javascript" charset="utf-8"></script>
+<script src="{% static 'test_apps/js/bootstrap.min.js' %}" type="text/javascript" charset="utf-8"></script>
+
+{% endblock %}
+
+
+{% include 'session_security/all.html' %}
+
+{% block app_css %}
+{% endblock %}
+
+{% block app_js %}
+{% endblock %}
+
+{% if user.is_authenticated %}
+<nav class="navbar navbar-fixed-top header" role="navigation" id='header-navbar'>
+    <div class='navbar-inner'>
+        <ul class='nav navbar-nav pull-left'>
+            <li class='active'><a href="https://github.com/saurabh-hirani" target='_blank'>Github Repo</a></li>
+            <li><a href="{% url 'loggedin_view' %}">Home</a></li>
+            {% for app_data in target_apps %}
+                <li> 
+                    <a href={% url app_data.url %}>{{ app_data.caption }}</a>
+                </li>
+            {% endfor %}
+            <li><a href="/admin" target="_blank">Admin</a></li>
+        </ul>
+        <ul class='nav navbar-nav pull-right'>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'logout_view' %}">Log out</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+{% endif %}
+
+<div id='sidebar'>
+  {% block sidebar %}
+  {% endblock %}
+</div>
+<div id='content'>
+  <div class='container margined_container'>
+    {% block content %}
+    Content
+    {% endblock %}
+  </div>
+</div>
+
+
+<div class="navbar navbar-fixed-bottom footer" id='footer-navbar'>
+    <div class="navbar-inner">
+        <div class="width-constraint clearfix">
+            <p class="muted credit"><center>TestApp v1.0.0</center></p>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+    {% if logged_in %}
+        //$("#header-navbar,#footer-navbar").hide().fadeIn(3000);
+    {% endif %}
+</script>
+
+</html>
+

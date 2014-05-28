@@ -1,0 +1,29 @@
+{% extends "polls/base.html" %}
+
+{% block content %}
+    <div class='row'>
+        <div class='col-md-6'>
+            <h2>{{ poll.question }} <small>Poll results</small></h2>
+            {% if ranked_choices %}
+                <table class='table table-striped table-bordered'>
+                <th>Position</th>
+                <th>Choice</th>
+                <th>Votes</th>
+                    {% for choice in ranked_choices %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ choice.choice_text }}</td>
+                        <td>{{ choice.votes }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% if poll.has_voting_started %}
+                    <a class="btn btn-primary" type="button" href="{% url 'polls:index' %}#closed_polls_tab">Back to results summary</a>
+                {% else %}
+                {% endif %}
+            {% else %}
+                No poll choices set. Please go to <a href="{% url 'admin:index' %}">Admin Page</a> to set the choices.
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
