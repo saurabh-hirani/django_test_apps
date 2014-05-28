@@ -25,6 +25,5 @@ I learnt django through the basic polling app as mentioned in the [django-docs](
     - A user can view results of a poll only if all the users have voted in the poll.
     - and so on...
   - Using TestCase to perform testing and the very useful coverage module to ensure code coverage.
-  - ![Sample screeshot](https://github.com/saurabh-hirani/django_test_apps/blob/master/poll-scrshot.png)
 
 The code in this repository is work in progress.
