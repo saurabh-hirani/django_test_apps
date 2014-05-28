@@ -27,3 +27,5 @@ I learnt django through the basic polling app as mentioned in the [django-docs](
   - Using TestCase to perform testing and the very useful coverage module to ensure code coverage.
 
 The code in this repository is work in progress.
+
+![Poll app screenshot](https://github.com/saurabh-hirani/django_test_apps/blob/master/poll-scrshot.png)
