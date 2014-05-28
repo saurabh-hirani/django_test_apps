@@ -15,6 +15,8 @@ I learnt django through the basic polling app as mentioned in the [django-docs](
   
 - Polling app specific features:
 
+  ![Poll app screenshot](https://raw.githubusercontent.com/saurabh-hirani/django_test_apps/master/poll-scrshot.png)
+
   - All users are associated with a poll upon the poll's creation (auto registration of voters.)
   - A poll stays in open state till all users vote for its choices, after which poll is closed and results are displayed.
   - A dashboard for showing - open polls, closed polls and polls pending current user's votes with an interesting ability to:
@@ -28,4 +30,3 @@ I learnt django through the basic polling app as mentioned in the [django-docs](
 
 The code in this repository is work in progress.
 
-![Poll app screenshot](https://raw.githubusercontent.com/saurabh-hirani/django_test_apps/master/poll-scrshot.png)
