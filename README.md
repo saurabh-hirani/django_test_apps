@@ -5,8 +5,8 @@ Works with django 1.9
 
 ```
 $ sudo pip install django=1.9 coverage django-session-security
-$ python manage.py createsuperuser
 $ python manage.py migrate --run-syncdb
+$ python manage.py createsuperuser
 $ ./runserver.sh
 ```
 
