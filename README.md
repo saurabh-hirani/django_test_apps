@@ -1,3 +1,15 @@
+DISCLAIMER
+===========
+
+Works with django 1.9
+
+```
+$ sudo pip install django=1.9 coverage django-session-security
+$ python manage.py createsuperuser
+$ python manage.py migrate --run-syncdb
+$ ./runserver.sh
+```
+
 django_test_apps
 ================
 
